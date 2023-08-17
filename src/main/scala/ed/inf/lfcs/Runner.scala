@@ -31,7 +31,8 @@ object Runner{
     
     val dumpFilePath = args(0)
     val dumpType = args(1)
-    val seed = args(2).toInt
+    val predicate = args(2).toInt
+    val seed = args(3).toInt
 
     println(s"DUMP: $dumpFilePath")
 
@@ -58,9 +59,15 @@ object Runner{
         .option("delimiter", delimiter)
         .schema(integerSchema)
         .load(dumpFilePath)
-      
+
+      println("DUMP READING DONE")
+      println("STARTING SUBSET EXTRACTION")
+
       val extractor: RecursiveQuery[Int] = new RecursiveQuery[Int]
-      extractor.getSubjectByObjectSeedRecOnPredicate(-840342212, Set(-193471730), df)
+      val results = extractor.getSubjectByObjectSeedRecOnPredicate(predicate, Set(seed), df)
+
+      println("RECURSIVE FINISHED")
+      println(s"LEN RESULT: ${results.size}")
     }
     else{
       println(s"READING WITH STRING SCHEMA")
@@ -71,40 +78,7 @@ object Runner{
         .schema(stringSchema)
         .load(dumpFilePath)
     }    
-
-    println("DUMP READING DONE")
-    
-    println("STARTING SUBSET EXTRACTION")
-
-    // val extractor = if (dumpType == "num") {
-      
-    // } else {
-    //   new RecursiveQuery[String]
-    // }
-    
-    
-  //   val qidRetriever = new QidRetriever(df)
-
-  //   if (dumpType == "num-2023"){
-  //     val subclasssList = qidRetriever.getQidsRecursiveNumerical2023(Set(seed), df)
-  //     println("RECURSIVE FINISHED")
-  //     println(s"LEN RESULT: ${subclasssList.size}")
-  //     println("DONE")
-  //     spark.stop()
-  //   }
-
-  //   else if (dumpType == "num-2015"){
-  //     val subclasssList = qidRetriever.getQidsRecursiveNumerical2015(Set(seed), df)
-  //     println("RECURSIVE FINISHED")
-  //     println(s"LEN RESULT: ${subclasssList.size}")
-  //     println("DONE")
-  //     spark.stop()
-  //   }
-
-  //   else
-  //     throw new UnsupportedOperationException(s"Undefined file type.")
-  // }
-  
+     
     spark.stop()
   }
 }
