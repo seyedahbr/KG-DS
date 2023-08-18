@@ -8,7 +8,7 @@ import ed.inf.lfcs.kgds.query._
 object Runner{
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder()
-      .appName("SparkRecursiveDumpFiltering")
+      .appName("KnowledgeGraphDistributedSubsetting")
       .getOrCreate()
 
     spark.sparkContext.setLogLevel("ERROR")
