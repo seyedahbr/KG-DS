@@ -4,7 +4,7 @@ import org.apache.spark.sql.{DataFrame, Row, Encoder, Encoders}
 import org.apache.spark.sql.functions._
 import scala.reflect.ClassTag
 
-class RecursiveQuery[T: ClassTag]{
+class SimpleRecursiveQuery[T: ClassTag]{
   private var allObjects: Set[T] = Set.empty
   
   def getSubjectByObjectSeedRecOnPredicate(predicate: T, objectSeed: Set[T], df: DataFrame): Set[T] = {
@@ -12,7 +12,7 @@ class RecursiveQuery[T: ClassTag]{
 
     println(s"STARTING GETTING SUBJECTS BY OBJECT SEED RECURSIVELY ON PREDICATE - LEN SEED: ${allObjects.size}")
     
-    return getSubjectRecOnPredicate(predicate, allObjects, df)
+    getSubjectRecOnPredicate(predicate, allObjects, df)
   }
   
   private def getSubjectRecOnPredicate(predicate: T, objects: Set[T], df: DataFrame): Set[T] = {
@@ -35,13 +35,12 @@ class RecursiveQuery[T: ClassTag]{
 
     println(s"LEN NEW OBJECTS: ${newObjects.size}")
 
-    if (newObjects.isEmpty)
-        return Set.empty[T]
+    if (newObjects.isEmpty) Set.empty[T] else{
+      allObjects ++= newObjects
 
-    allObjects ++= newObjects
+      println(s"LEN ALL RETRIEVEDS: ${allObjects.size}")
 
-    println(s"LEN ALL RETRIEVEDS: ${allObjects.size}")
-
-    return newObjects ++ getSubjectRecOnPredicate(predicate, newObjects, df)
+      newObjects ++ getSubjectRecOnPredicate(predicate, newObjects, df)
+    }
   }
 }
