@@ -21,8 +21,11 @@ object Runner{
     val pp: ProgramParser = new ProgramParser(spark)
     val parseMap = pp.parseFile(program)
     val planner: ProgramPlanner = new ProgramPlanner(spark)
-    val rdd = planner.execute(parseMap)    
-    rdd.saveAsTextFile(parseMap("output"))
+    val outDF = planner.execute(parseMap)
+    outDF.write
+      .format("csv")
+      .option("header", "false")
+      .save(parseMap("output"))   
      
     spark.stop()
   }

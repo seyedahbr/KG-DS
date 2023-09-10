@@ -1,0 +1,5 @@
+dump dump_2023.csv
+program simple_triple_filter
+dumptype numerical
+predicate NOT{-280828914,-840342212}
+output temp_subset

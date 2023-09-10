@@ -8,7 +8,7 @@ import ed.inf.lfcs.kgds.query._
 
 class ProgramPlanner(spark: SparkSession){
   
-  def execute(parseMap: Map[String, String]): RDD[Row] = {
+  def execute(parseMap: Map[String, String]): DataFrame = {
     /* TEMPORARY LOGIC */
     
     // Define the schema for the columns
@@ -42,7 +42,7 @@ class ProgramPlanner(spark: SparkSession){
 
     var df: DataFrame = null
     
-    if (dumpType == "numerical"){
+    if (dumpType == "numerical") {
       println(s"READING WITH INTEGER SCHEMA")
       
       df = spark.read
@@ -50,7 +50,7 @@ class ProgramPlanner(spark: SparkSession){
         .option("delimiter", delimiter)
         .schema(integerSchema)
         .load(dumpFilePath)
-    } else{
+    } else {
       println(s"READING WITH STRING SCHEMA")
 
       df = spark.read
@@ -62,8 +62,9 @@ class ProgramPlanner(spark: SparkSession){
     
     println("DUMP READING DONE")
     
-    if (program == "instance_of_subclass")
-    {
+    import spark.implicits._
+
+    if (program == "instance_of_subclass") {
       if (dumpType == "numerical"){
         val subclassPredicate = parseMap("subclass_of").toInt
         val seed = parseMap("seed").toInt
@@ -76,15 +77,90 @@ class ProgramPlanner(spark: SparkSession){
 
         println(s"RECURSIVE FINISHED, LEN: ${subclass_results.size}")
 
-        val item_extratcor:SimpleFilteringQuery[Int] = new SimpleFilteringQuery[Int]
-        val item_results = item_extratcor.getSubjectByObjectSeedOnPredicate(instancePredicate, subclass_results, df)
+        val item_extractor: SimpleFilteringQuery[Int] = new SimpleFilteringQuery[Int]
+        val item_results = item_extractor.getSubjectByObjectSeedOnPredicate(instancePredicate, subclass_results, df)
         
-        spark.sparkContext.parallelize(item_results.toSeq).map {
-          case (intValue) => Row(intValue)
-        }
+        // spark.sparkContext.parallelize(item_results.toSeq).map {
+        //   case (intValue) => Row(intValue)
+        // }
+
+        spark.sparkContext.parallelize(item_results.toSeq).toDF
+        
       }
-        else{ spark.sparkContext.emptyRDD}
+      else { 
+        val subclassPredicate = parseMap("subclass_of")
+        val seed = parseMap("seed")
+        val instancePredicate = parseMap("instance_of")
+        
+        println("STARTING SUBSET EXTRACTION")
+        
+        val subclass_extractor: SimpleRecursiveQuery[String] = new SimpleRecursiveQuery[String]
+        val subclass_results = subclass_extractor.getSubjectByObjectSeedRecOnPredicate(subclassPredicate, Set(seed), df)
+
+        println(s"RECURSIVE FINISHED, LEN: ${subclass_results.size}")
+
+        val item_extractor: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]
+        val item_results = item_extractor.getSubjectByObjectSeedOnPredicate(instancePredicate, subclass_results, df)
+        
+        // spark.sparkContext.parallelize(item_results.toSeq).map {
+        //   case (intValue) => Row(intValue)
+        // }
+
+        spark.sparkContext.parallelize(item_results.toSeq).toDF
+      }
     }
-    else{ spark.sparkContext.emptyRDD}
+    else if (program == "shortest_path") {
+      if (dumpType == "numerical") {
+        val src = parseMap("source").toInt
+        val des = parseMap("destination").toInt
+
+        println("STARTING SHORTEST PATH")
+
+        val shpth: SimpleShortestPath[Int] = new SimpleShortestPath[Int]
+        val shpthDF = shpth.getShortestPathSrcDes(df, src, des)
+        
+        shpthDF.show(truncate = false)
+
+        val temp = Seq("TODO")
+        spark.sparkContext.parallelize(temp).toDF
+
+      }
+      else { val temp = Seq("TODO")
+        spark.sparkContext.parallelize(temp).toDF }
+    }
+    else if (program == "simple_triple_filter"){
+
+      if (dumpType == "numerical") {
+        val subjSeed = Set.empty[Int]
+        val predSeed = Set(-280828914,-840342212)
+        val objSeed = Set.empty[Int]
+        val negFiltering = true
+
+        val triple_extractor: SimpleFilteringQuery[Int] = new SimpleFilteringQuery[Int]
+        val triple_results = if (negFiltering) {
+          triple_extractor.getTriplesNotInSeed(subjSeed, predSeed, objSeed, df)
+        } else {
+          triple_extractor.getTriplesInSeed(subjSeed, predSeed, objSeed, df)
+          null
+        }
+        triple_results
+      }
+      else {
+        val subjSeed = Set.empty[String]
+        val predSeed = Set.empty[String]
+        val objSeed = Set.empty[String]
+        val negFiltering = true
+
+        val triple_extractor: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]
+        val triple_results = if (negFiltering) {
+          triple_extractor.getTriplesNotInSeed(subjSeed, predSeed, objSeed, df)
+        } else {
+          triple_extractor.getTriplesInSeed(subjSeed, predSeed, objSeed, df)
+          null
+        }
+        triple_results
+      }
+    }
+    else { throw new UnsupportedOperationException("Program not found") }
   }
 }
