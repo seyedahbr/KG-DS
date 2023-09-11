@@ -161,6 +161,13 @@ class ProgramPlanner(spark: SparkSession){
         triple_results
       }
     }
+    else if (program == "remove_literals"){
+      if (dumpType == "textual") {
+        val literal_remover: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]
+        literal_remover.getNonLiterals(df)
+      }
+      else { throw new UnsupportedOperationException("Program not found") }
+    }
     else { throw new UnsupportedOperationException("Program not found") }
   }
 }
