@@ -168,6 +168,13 @@ class ProgramPlanner(spark: SparkSession){
       }
       else { throw new UnsupportedOperationException("Program not found") }
     }
+    else if (program == "wdt_to_items"){
+      if (dumpType == "textual") {
+        val literal_remover: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]
+        literal_remover.getWdtToItems(df)
+      }
+      else { throw new UnsupportedOperationException("Program not found") }
+    }
     else { throw new UnsupportedOperationException("Program not found") }
   }
 }
