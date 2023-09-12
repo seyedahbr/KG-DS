@@ -57,8 +57,7 @@ class SimpleFilteringQuery[T: ClassTag]{
   def getNonLiterals(df: DataFrame): DataFrame = {
     println("STARTING REMOVING LITERALS")
     
-    val condition = !(col("_c2").startsWith("\"") && col("_c2").contains("^^"))
-
+    val condition = col("_c2").startsWith("<")
     df.filter(condition)
       .select("_c0", "_c1", "_c2")
   }
