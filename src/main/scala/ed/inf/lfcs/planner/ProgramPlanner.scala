@@ -78,12 +78,8 @@ class ProgramPlanner(spark: SparkSession){
         println(s"RECURSIVE FINISHED, LEN: ${subclass_results.size}")
 
         val item_extractor: SimpleFilteringQuery[Int] = new SimpleFilteringQuery[Int]
-        val item_results = item_extractor.getSubjectByObjectSeedOnPredicate(instancePredicate, subclass_results, df)
+        val item_results = item_extractor.getSubjectByObjectSeedOnPredicate(instancePredicate, subclass_results, df)       
         
-        // spark.sparkContext.parallelize(item_results.toSeq).map {
-        //   case (intValue) => Row(intValue)
-        // }
-
         spark.sparkContext.parallelize(item_results.toSeq).toDF
         
       }
@@ -101,11 +97,6 @@ class ProgramPlanner(spark: SparkSession){
 
         val item_extractor: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]
         val item_results = item_extractor.getSubjectByObjectSeedOnPredicate(instancePredicate, subclass_results, df)
-        
-        // spark.sparkContext.parallelize(item_results.toSeq).map {
-        //   case (intValue) => Row(intValue)
-        // }
-
         spark.sparkContext.parallelize(item_results.toSeq).toDF
       }
     }
@@ -165,6 +156,13 @@ class ProgramPlanner(spark: SparkSession){
       if (dumpType == "textual") {
         val literal_remover: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]
         literal_remover.getNonLiterals(df)
+      }
+      else { throw new UnsupportedOperationException("Program not found") }
+    }
+    else if (program == "items_graph"){
+      if (dumpType == "textual") {
+        val itemGraphExtractor: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]
+        itemGraphExtractor.getItemsGraph(df)
       }
       else { throw new UnsupportedOperationException("Program not found") }
     }
