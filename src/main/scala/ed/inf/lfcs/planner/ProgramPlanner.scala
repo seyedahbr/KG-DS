@@ -159,6 +159,13 @@ class ProgramPlanner(spark: SparkSession){
       }
       else { throw new UnsupportedOperationException("Program not found") }
     }
+    else if (program == "remove_externals"){
+      if (dumpType == "textual") {
+        val external_IRI_remover: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]
+        external_IRI_remover.getInternalIRIObjects(df)
+      }
+      else { throw new UnsupportedOperationException("Program not found") }
+    }
     else if (program == "items_graph"){
       if (dumpType == "textual") {
         val itemGraphExtractor: SimpleFilteringQuery[String] = new SimpleFilteringQuery[String]

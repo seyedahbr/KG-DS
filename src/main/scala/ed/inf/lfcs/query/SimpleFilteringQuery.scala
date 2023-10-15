@@ -62,6 +62,14 @@ class SimpleFilteringQuery[T: ClassTag]{
       .select("_c0", "_c1", "_c2")
   }
 
+  def getInternalIRIObjects(df: DataFrame): DataFrame = {
+    println("STARTING REMOVING EXTERNAL IRIS")
+    
+    val condition = col("_c2").startsWith("<http://www.wikidata.org/")
+    df.filter(condition)
+      .select("_c0", "_c1", "_c2")
+  }
+
   def getItemsGraph(df: DataFrame): DataFrame = {
       
     val baseDf = getNonLiterals(df)
