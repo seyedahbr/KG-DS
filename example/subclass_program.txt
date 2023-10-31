@@ -1,7 +1,6 @@
-dump dump_2023.csv 
+dump /Users/shossei2/wikidata_dumps/s23.nt
 program instance_of_subclass
-dumptype numerical
-subclass_of -280828914
-instance_of -840342212
-seed -1874640056
+subclass_of <http://www.wikidata.org/prop/direct/P31> 
+instance_of <http://www.wikidata.org/prop/direct/P279>
+seed <http://www.wikidata.org/entity/Q7187> 
 output temp_subset

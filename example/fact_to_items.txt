@@ -1,0 +1,5 @@
+dump wikidata_2023.nt
+program fact_to_items
+item_iri_prefix <http://www.wikidata.org/entity/Q
+fact_iri_prefix <http://www.wikidata.org/prop/direct/P
+output temp_subset

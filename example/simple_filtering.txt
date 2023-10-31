@@ -1,5 +1,4 @@
-dump dump_2023.csv
+dump wikidata_2023.nt
 program simple_triple_filter
-dumptype numerical
-predicate NOT{-280828914,-840342212}
+predicate NOTIN{<http://www.wikidata.org/prop/direct/P31>,<http://www.wikidata.org/prop/direct/P279>}
 output temp_subset
