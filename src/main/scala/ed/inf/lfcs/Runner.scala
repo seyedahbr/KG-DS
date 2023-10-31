@@ -1,6 +1,7 @@
 package ed.inf.lfcs.kgds.runner
 
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
 
 import ed.inf.lfcs.kgds.parser._
 import ed.inf.lfcs.kgds.planner._
@@ -22,10 +23,24 @@ object Runner{
     val parseMap = pp.parseFile(program)
     val planner: ProgramPlanner = new ProgramPlanner(spark)
     val outDF = planner.execute(parseMap)
-    outDF.write
+    
+    val outputPath = parseMap("output")
+    val ext = outputPath.split("\\.").last    
+    val delimiter = ext match {
+      case "tsv" => "\t"
+      case "nt" => " "
+      case _ => ","
+    }
+
+    val saveDF = if (ext == "nt") outDF.withColumn("_c3", lit(".")) else outDF
+    
+    println(s"SAVING OUTPUT IN : $outputPath")
+
+    saveDF.write
       .mode("overwrite")
-      .format("csv")
+      .format("csv")      
       .option("header", "false")
+      .option("delimiter", delimiter)
       .save(parseMap("output"))   
      
     spark.stop()
