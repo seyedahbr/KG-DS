@@ -4,7 +4,16 @@ import org.apache.spark.sql.{DataFrame, Row, Encoder, Encoders}
 import org.apache.spark.sql.functions._
 import scala.reflect.ClassTag
 
-class HierarchicalFiltering[T: ClassTag]{
+class HierarchicalFiltering{
+
+  def getLiteralsNoLabelling(labelingPredicates: Set[String], df: DataFrame): DataFrame = {
+    println("STARTING EXTRACTING LITERALS")
+
+    val labellingPredLst = labelingPredicates.toList
+    val condition = !col("_c2").startsWith("<") && !col("_c1").isin(labellingPredLst:_*)
+    df.filter(condition)
+      .select("_c0", "_c1", "_c2")
+  }
   
   def getNonLiterals(df: DataFrame): DataFrame = {
     println("STARTING REMOVING LITERALS")
@@ -34,7 +43,7 @@ class HierarchicalFiltering[T: ClassTag]{
     val qualStatementsList = baseDf.filter(qualifiersCondition)
       .select("_c0")
       .rdd
-      .map(row => row.getAs[T](0))
+      .map(row => row.getAs[String](0))
       .collect()
       .toList
       .distinct
@@ -45,7 +54,7 @@ class HierarchicalFiltering[T: ClassTag]{
     val refList = baseDf.filter(referencesCondition)
       .select("_c0")
       .rdd
-      .map(row => row.getAs[T](0))
+      .map(row => row.getAs[String](0))
       .collect()
       .toList
       .distinct
@@ -56,7 +65,7 @@ class HierarchicalFiltering[T: ClassTag]{
     val refStatementList = baseDf.filter(refStatementCondition)
       .select("_c0")
       .rdd
-      .map(row => row.getAs[T](0))
+      .map(row => row.getAs[String](0))
       .collect()
       .toList
       .distinct

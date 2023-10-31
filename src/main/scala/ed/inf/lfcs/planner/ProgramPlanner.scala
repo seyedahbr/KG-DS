@@ -103,26 +103,33 @@ class ProgramPlanner(spark: SparkSession){
       triple_extractor.getTriplesInSeed(subjSeed, subjNeg, predSeed, predNeg, objSeed, objNeg, df)
     }
     else if (program == "remove_literals"){
-      val literal_remover: HierarchicalFiltering[String] = new HierarchicalFiltering[String]
+      val literal_remover: HierarchicalFiltering = new HierarchicalFiltering
       literal_remover.getNonLiterals(df)      
     }
     else if (program == "remove_externals"){
       val internalKGIRIPrefix = parseMap("internal_iri_prefix")
-      val external_IRI_remover: HierarchicalFiltering[String] = new HierarchicalFiltering[String]
+      val external_IRI_remover: HierarchicalFiltering = new HierarchicalFiltering
       external_IRI_remover.getInternalIRIObjects(internalKGIRIPrefix, df)
     }
     else if (program == "remove_non_item_contextuals"){
       val statementIRIPrefix = parseMap("statement_iri_prefix")
       val itemIRIPrefix = parseMap("item_iri_prefix")
       val referenceIRIPrefix = parseMap("reference_iri_prefix")
-      val itemGraphExtractor: HierarchicalFiltering[String] = new HierarchicalFiltering[String]
+      val itemGraphExtractor: HierarchicalFiltering = new HierarchicalFiltering
       itemGraphExtractor.getItemsGraph(statementIRIPrefix, itemIRIPrefix, referenceIRIPrefix, df)
     }
     else if (program == "fact_to_items"){
       val itemIRIPrefix = parseMap("item_iri_prefix")
       val factIRIPrefix = parseMap("fact_iri_prefix")
-      val literal_remover: HierarchicalFiltering[String] = new HierarchicalFiltering[String]
-      literal_remover.getFactToItems(factIRIPrefix, itemIRIPrefix, df)
+      val factitem_extractor: HierarchicalFiltering = new HierarchicalFiltering
+      factitem_extractor.getFactToItems(factIRIPrefix, itemIRIPrefix, df)
+    }
+    else if (program == "extract_literals_no_labelings"){
+      
+      val pred = parseMap("labelling_predicate")
+      val predSeed = pred.replaceAll("[{}]", "").split(",").map(_.trim).toSet
+      val literal_extractor: HierarchicalFiltering = new HierarchicalFiltering
+      literal_extractor.getLiteralsNoLabelling(predSeed, df)
     }
     else { throw new UnsupportedOperationException("Program not found") }
   }
