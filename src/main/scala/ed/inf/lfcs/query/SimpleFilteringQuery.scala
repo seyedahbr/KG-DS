@@ -24,31 +24,44 @@ class SimpleFilteringQuery[T: ClassTag]{
     queryObjects.toSet
   }
 
-  def getTriplesNotInSeed(subjectSeed: Set[T], predicateSeed: Set[T], objectSeed: Set[T], df: DataFrame): DataFrame = {
+  def getTriplesInSeed(subjectSeed: Set[T],
+    subjNeg: Boolean,
+    predicateSeed: Set[T],
+    predNeg: Boolean,
+    objectSeed: Set[T],
+    objNeg: Boolean,
+    df: DataFrame): DataFrame = {
     println("STARTING FILTERING TRIPLES BY SEED")
     
     val subjlst = subjectSeed.toList
     val predlst = predicateSeed.toList
     val objlst = objectSeed.toList
 
-    val condition = (!col("_c0").isin(subjlst:_*)) &&
-      (!col("_c1").isin(predlst:_*)) &&
-      (!col("_c2").isin(objlst:_*))
+    val subjCond = if (subjNeg && subjlst.nonEmpty) {
+      !col("_c0").isin(subjlst:_*)
+    } else if (!subjNeg && subjlst.nonEmpty) {
+      col("_c0").isin(subjlst:_*)
+    } else {
+      lit(true)
+    }
 
-    df.filter(condition)
-      .select("_c0", "_c1", "_c2")
-  }
+    val predCon = if (predNeg && predlst.nonEmpty) {
+      !col("_c1").isin(predlst:_*)
+    } else if (!predNeg && predlst.nonEmpty) {
+      col("_c1").isin(predlst:_*)
+    } else {
+      lit(true)
+    }
 
-  def getTriplesInSeed(subjectSeed: Set[T], predicateSeed: Set[T], objectSeed: Set[T], df: DataFrame): DataFrame = {
-    println("STARTING FILTERING TRIPLES BY SEED")
-    
-    val subjlst = subjectSeed.toList
-    val predlst = predicateSeed.toList
-    val objlst = objectSeed.toList
+    val objCon = if (objNeg && objlst.nonEmpty) {
+      !col("_c2").isin(objlst:_*)
+    } else if (!objNeg && objlst.nonEmpty) {
+      col("_c2").isin(objlst:_*)
+    } else {
+      lit(true)
+    }
 
-    val condition = (col("_c0").isin(subjlst:_*)) &&
-      (col("_c1").isin(predlst:_*)) &&
-      (col("_c2").isin(objlst:_*))
+    val condition = subjCond && predCon && objCon
 
     df.filter(condition)
       .select("_c0", "_c1", "_c2")

@@ -23,6 +23,7 @@ object Runner{
     val planner: ProgramPlanner = new ProgramPlanner(spark)
     val outDF = planner.execute(parseMap)
     outDF.write
+      .mode("overwrite")
       .format("csv")
       .option("header", "false")
       .save(parseMap("output"))   

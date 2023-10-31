@@ -14,23 +14,23 @@ class HierarchicalFiltering[T: ClassTag]{
       .select("_c0", "_c1", "_c2")
   }
 
-  def getInternalIRIObjects(df: DataFrame): DataFrame = {
+  def getInternalIRIObjects(internalIRIPrefix: String, df: DataFrame): DataFrame = {
     println("STARTING REMOVING EXTERNAL IRIS")
     
-    val condition = col("_c2").startsWith("<http://www.wikidata.org/")
+    val condition = col("_c2").startsWith("<" + internalIRIPrefix)
     df.filter(condition)
       .select("_c0", "_c1", "_c2")
   }
 
   // TODO: Needed to be changed (driver memory exceed)
-  def getItemsGraph(df: DataFrame): DataFrame = {
+  def getItemsGraph(statementIRIPrefix: String, itemIRIPrefix: String, referenceIRIPrefix: String, df: DataFrame): DataFrame = {
       
     val baseDf = getNonLiterals(df)
 
     println("STARTING FILTERING STATEMENT->ITEM TRIPLES")
 
-    val qualifiersCondition = col("_c0").startsWith("<http://www.wikidata.org/entity/statement/") &&
-    col("_c2").startsWith("<http://www.wikidata.org/entity/Q")
+    val qualifiersCondition = col("_c0").startsWith(statementIRIPrefix) &&
+    col("_c2").startsWith(itemIRIPrefix)
     val qualStatementsList = baseDf.filter(qualifiersCondition)
       .select("_c0")
       .rdd
@@ -40,8 +40,8 @@ class HierarchicalFiltering[T: ClassTag]{
       .distinct
     
     println("STARTING FILTERING REFERENCE->ITEM TRIPLES")
-    val referencesCondition = col("_c0").startsWith("<http://www.wikidata.org/reference/") &&
-    col("_c2").startsWith("<http://www.wikidata.org/entity/Q")
+    val referencesCondition = col("_c0").startsWith(referenceIRIPrefix) &&
+    col("_c2").startsWith(itemIRIPrefix)
     val refList = baseDf.filter(referencesCondition)
       .select("_c0")
       .rdd
@@ -51,7 +51,7 @@ class HierarchicalFiltering[T: ClassTag]{
       .distinct
     
     println("STARTING FILTERING STATEMENT->REFERENCE->ITEM TRIPLES")
-    val refStatementCondition = col("_c0").startsWith("<http://www.wikidata.org/entity/statement/") &&
+    val refStatementCondition = col("_c0").startsWith(statementIRIPrefix) &&
     col("_c2").isin(refList:_*)
     val refStatementList = baseDf.filter(refStatementCondition)
       .select("_c0")
@@ -64,20 +64,20 @@ class HierarchicalFiltering[T: ClassTag]{
     val mergedList = (qualStatementsList ++ refStatementList).toSet.toList
 
     println("STARTING FILTERING ITEMS GRAPH")
-    val condition = !(col("_c0").startsWith("<http://www.wikidata.org/entity/statement/") || 
-    col("_c0").startsWith("<http://www.wikidata.org/reference/")) ||
-    (col("_c0").startsWith("<http://www.wikidata.org/entity/statement/") && col("_c0").isin(mergedList:_*)) ||
-     (col("_c0").startsWith("<http://www.wikidata.org/reference/") && col("_c0").isin(refList:_*))
+    val condition = !(col("_c0").startsWith(statementIRIPrefix) || 
+    col("_c0").startsWith(referenceIRIPrefix)) ||
+    (col("_c0").startsWith(statementIRIPrefix) && col("_c0").isin(mergedList:_*)) ||
+    (col("_c0").startsWith(referenceIRIPrefix) && col("_c0").isin(refList:_*))
     
     baseDf.filter(condition)
       .select("_c0", "_c1", "_c2")
   }
 
-  def getWdtToItems(df: DataFrame): DataFrame = {
-    println("STARTING FILTERING WDT:->ITEMS TRIPLES")
+  def getFactToItems(factIRIPrefix: String, itemIRIPrefix: String, df: DataFrame): DataFrame = {
+    println("STARTING FILTERING FACT:->ITEMS TRIPLES")
     
-    val condition = (col("_c1").startsWith("<http://www.wikidata.org/entity/assert/P")) &&
-    (col("_c2").startsWith("<http://www.wikidata.org/entity/Q"))
+    val condition = (col("_c1").startsWith(factIRIPrefix)) &&
+    (col("_c2").startsWith(itemIRIPrefix))
 
     df.filter(condition)
       .select("_c0", "_c1", "_c2")
