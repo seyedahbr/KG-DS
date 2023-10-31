@@ -122,7 +122,7 @@ class ProgramPlanner(spark: SparkSession){
       val itemIRIPrefix = parseMap("item_iri_prefix")
       val factIRIPrefix = parseMap("fact_iri_prefix")
       val literal_remover: HierarchicalFiltering[String] = new HierarchicalFiltering[String]
-      literal_remover.getFactToItems(itemIRIPrefix, factIRIPrefix, df)
+      literal_remover.getFactToItems(factIRIPrefix, itemIRIPrefix, df)
     }
     else { throw new UnsupportedOperationException("Program not found") }
   }
