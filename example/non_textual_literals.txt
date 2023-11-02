@@ -1,4 +1,4 @@
-dump /Users/shossei2/wikidata_dumps/s23.nt
+dump wikidata_2023.nt
 program extract_literals_no_labelings
 labelling_predicate {<http://www.w3.org/2000/01/rdf-schema#label>,<http://www.w3.org/2004/02/skos/core#prefLabel>,<http://schema.org/name>,<http://schema.org/description>,<http://www.w3.org/2004/02/skos/core#altLabel>}
 output temp_subset.nt

@@ -1,4 +1,4 @@
-dump /Users/shossei2/wikidata_dumps/s23.nt
+dump wikidata_2023.nt
 program instance_of_subclass
 subclass_of <http://www.wikidata.org/prop/direct/P31> 
 instance_of <http://www.wikidata.org/prop/direct/P279>

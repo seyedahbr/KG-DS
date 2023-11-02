@@ -1,4 +1,4 @@
-dump /Users/shossei2/wikidata_dumps/temp_dump.csv 
+dump wikidata_2023.nt
 program shortest_path
 dumptype numerical
 source 1

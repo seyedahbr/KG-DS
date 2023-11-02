@@ -1,4 +1,4 @@
-dump /Users/shossei2/wikidata_dumps/s15.csv
+dump wikidata_2023.nt
 program remove_literals
 dumptype textual
 output temp_subset
