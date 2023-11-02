@@ -118,7 +118,7 @@ class ProgramPlanner(spark: SparkSession){
       val itemGraphExtractor: HierarchicalFiltering = new HierarchicalFiltering
       itemGraphExtractor.getItemsGraph(statementIRIPrefix, itemIRIPrefix, referenceIRIPrefix, df)
     }
-    else if (program == "fact_to_items"){
+    else if (program == "extract_fact_to_items"){
       val itemIRIPrefix = parseMap("item_iri_prefix")
       val factIRIPrefix = parseMap("fact_iri_prefix")
       val factitem_extractor: HierarchicalFiltering = new HierarchicalFiltering
@@ -130,6 +130,11 @@ class ProgramPlanner(spark: SparkSession){
       val predSeed = pred.replaceAll("[{}]", "").split(",").map(_.trim).toSet
       val literal_extractor: HierarchicalFiltering = new HierarchicalFiltering
       literal_extractor.getLiteralsNoLabelling(predSeed, df)
+    }
+    else if (program == "extract_externals"){
+      val internalKGIRIPrefix = parseMap("internal_iri_prefix")
+      val external_IRI_extractor: HierarchicalFiltering = new HierarchicalFiltering
+      external_IRI_extractor.getExternalIRIs(internalKGIRIPrefix, df)
     }
     else { throw new UnsupportedOperationException("Program not found") }
   }

@@ -1,0 +1,4 @@
+dump wikidata_2023.nt
+program extract_externals
+internal_iri_prefix http://www.wikidata.org/
+output temp_subset.nt
