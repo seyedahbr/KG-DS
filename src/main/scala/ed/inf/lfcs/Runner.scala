@@ -40,6 +40,8 @@ object Runner{
       .mode("overwrite")
       .format("csv")      
       .option("header", "false")
+      .option("quote", "")
+      .option("escape", "") 
       .option("delimiter", delimiter)
       .save(parseMap("output"))   
      
