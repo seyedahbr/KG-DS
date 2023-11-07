@@ -121,20 +121,33 @@ class ProgramPlanner(spark: SparkSession){
     else if (program == "extract_fact_to_items"){
       val itemIRIPrefix = parseMap("item_iri_prefix")
       val factIRIPrefix = parseMap("fact_iri_prefix")
-      val factitem_extractor: HierarchicalFiltering = new HierarchicalFiltering
-      factitem_extractor.getFactToItems(factIRIPrefix, itemIRIPrefix, df)
+      val factitemExtractor: HierarchicalFiltering = new HierarchicalFiltering
+      factitemExtractor.getFactToItems(factIRIPrefix, itemIRIPrefix, df)
     }
     else if (program == "extract_literals_no_labelings"){
       
       val pred = parseMap("labelling_predicate")
-      val predSeed = pred.replaceAll("[{}]", "").split(",").map(_.trim).toSet
-      val literal_extractor: HierarchicalFiltering = new HierarchicalFiltering
-      literal_extractor.getLiteralsNoLabelling(predSeed, df)
+      val predSeed = pred.replaceAll("[{}]", "")
+        .split(",")
+        .map(_.trim)
+        .toSet
+      val literalExtractor: HierarchicalFiltering = new HierarchicalFiltering
+      literalExtractor.getLiteralsNoLabelling(predSeed, df)
     }
     else if (program == "extract_externals"){
       val internalKGIRIPrefix = parseMap("internal_iri_prefix")
-      val external_IRI_extractor: HierarchicalFiltering = new HierarchicalFiltering
-      external_IRI_extractor.getExternalIRIs(internalKGIRIPrefix, df)
+      val externalIRIExtractor: HierarchicalFiltering = new HierarchicalFiltering
+      externalIRIExtractor.getExternalIRIs(internalKGIRIPrefix, df)
+    }
+    else if (program == "extract_contextual_facts"){
+      val itemIRIPrefix = parseMap("item_iri_prefix")
+      val contextualIRIs = parseMap("intermediate_iri_prefix")
+        .replaceAll("[{}]", "")
+        .split(",")
+        .map(_.trim)
+        .toSet
+      val contextualExtractor: HierarchicalFiltering = new HierarchicalFiltering
+      contextualExtractor.getContextualFacts(itemIRIPrefix, contextualIRIs, df)
     }
     else { throw new UnsupportedOperationException("Program not found") }
   }

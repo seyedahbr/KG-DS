@@ -1,6 +1,6 @@
 package ed.inf.lfcs.kgds.query
 
-import org.apache.spark.sql.{DataFrame, Row, Encoder, Encoders}
+import org.apache.spark.sql.{DataFrame, Column, Row, Encoder, Encoders}
 import org.apache.spark.sql.functions._
 import scala.reflect.ClassTag
 
@@ -22,7 +22,23 @@ class HierarchicalFiltering{
     df.filter(condition)
       .select("_c0", "_c1", "_c2")
   }
+
+  def getContextualFacts(itemIRIPrefix: String, intermediateNodesIRIprefix: Set[String], df: DataFrame): DataFrame = {
+    println("STARTING EXTRACTING CONTEXTUAL FACTS")
+    
+    var condition: Column = lit(false)
+    for (iri <- intermediateNodesIRIprefix) {
+      condition = condition || 
+        (col("_c0").startsWith("<" + itemIRIPrefix) && col("_c2").startsWith("<" + iri)) || 
+        (col("_c0").startsWith("<" + iri) && col("_c2").startsWith("<"))
+    }
+
+    df.filter(condition)
+      .select("_c0", "_c1", "_c2")
+  }
   
+
+  // Excluder methods
   def getNonLiterals(df: DataFrame): DataFrame = {
     println("STARTING REMOVING LITERALS")
     

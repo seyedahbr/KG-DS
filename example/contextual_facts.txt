@@ -1,0 +1,5 @@
+dump wikidata_2023.nt
+program extract_contextual_facts
+item_iri_prefix http://www.wikidata.org/entity/Q
+intermediate_iri_prefix {http://www.wikidata.org/entity/statement/,http://www.wikidata.org/reference/}
+output temp_subset.nt
