@@ -1,6 +1,0 @@
-dump wikidata_2023.nt
-program remove_non_item_contextuals
-statement_iri_prefix <http://www.wikidata.org/entity/statement/
-item_iri_prefix <http://www.wikidata.org/entity/Q
-reference_iri_prefix <http://www.wikidata.org/reference/
-output temp_subset
