@@ -124,6 +124,16 @@ class ProgramPlanner(spark: SparkSession){
       val factitemExtractor: HierarchicalFiltering = new HierarchicalFiltering
       factitemExtractor.getFactToItems(factIRIPrefix, itemIRIPrefix, df)
     }
+    else if (program == "extract_labelings"){
+      
+      val pred = parseMap("labelling_predicate")
+      val predSeed = pred.replaceAll("[{}]", "")
+        .split(",")
+        .map(_.trim)
+        .toSet
+      val labellingsExtractor: HierarchicalFiltering = new HierarchicalFiltering
+      labellingsExtractor.getLabellings(predSeed, df)
+    }
     else if (program == "extract_literals_no_labelings"){
       
       val pred = parseMap("labelling_predicate")

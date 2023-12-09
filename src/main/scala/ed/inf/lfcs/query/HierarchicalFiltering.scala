@@ -6,6 +6,15 @@ import scala.reflect.ClassTag
 
 class HierarchicalFiltering{
 
+  def getLabellings(labelingPredicates: Set[String], df: DataFrame): DataFrame = {
+    println("STARTING EXTRACTING LABELINGS")
+
+    val labellingPredLst = labelingPredicates.toList
+    val condition = col("_c1").isin(labellingPredLst:_*)
+    df.filter(condition)
+      .select("_c0", "_c1", "_c2")
+  }
+  
   def getLiteralsNoLabelling(labelingPredicates: Set[String], df: DataFrame): DataFrame = {
     println("STARTING EXTRACTING LITERALS")
 
